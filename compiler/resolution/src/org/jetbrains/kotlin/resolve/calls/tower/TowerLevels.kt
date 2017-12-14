@@ -235,20 +235,53 @@ internal open class ScopeBasedTowerLevel protected constructor(
     override fun getObjects(
         name: Name,
         extensionReceiver: ReceiverValueWithSmartCastInfo?
-    ): Collection<CandidateWithBoundDispatchReceiver> = resolutionScope.getContributedObjectVariables(name, location).map {
-        createCandidateDescriptor(it, dispatchReceiver = null)
+    ): Collection<CandidateWithBoundDispatchReceiver> {
+        if (resolutionScope is LexicalChainedScope) {
+            // Slow-path for deprecation per KT-21515
+            return resolutionScope.getContributedObjectVariablesWithDeprecation(name, location).map { (classifier, isDeprecated) ->
+                createCandidateDescriptor(classifier, dispatchReceiver = null, specialError = if (isDeprecated) ResolvedUsingDeprecatedVisbility else null)
+            }
+        }
+
+        // Fast-path
+        return resolutionScope.getContributedObjectVariables(name, location).map {
+            createCandidateDescriptor(it, dispatchReceiver = null)
+        }
     }
 
     override fun getFunctions(
         name: Name,
         extensionReceiver: ReceiverValueWithSmartCastInfo?
-    ): Collection<CandidateWithBoundDispatchReceiver> = resolutionScope.getContributedFunctionsAndConstructors(
-        name,
-        location,
-        scopeTower.syntheticScopes,
-        resolutionScope
-    ).map {
-        createCandidateDescriptor(it, dispatchReceiver = null)
+    ): Collection<CandidateWithBoundDispatchReceiver> {
+        if (resolutionScope is LexicalChainedScope) {
+            // Slowpath for deprecation in KT-21515
+            val (notDeprecatedDescriptors, deprecatedDescriptors) = resolutionScope.getContributedFunctionsAndConstructorsWithDeprecation(
+                name, location, scopeTower.syntheticScopes, resolutionScope
+            )
+
+            val result = ArrayList<CandidateWithBoundDispatchReceiver>()
+
+            notDeprecatedDescriptors.mapTo(result) { createCandidateDescriptor(it, dispatchReceiver = null) }
+            deprecatedDescriptors.mapTo(result) {
+                createCandidateDescriptor(
+                    it,
+                    dispatchReceiver = null,
+                    specialError = ResolvedUsingDeprecatedVisbility
+                )
+            }
+
+            return result
+        }
+
+        // Fast-path for common cases
+        return resolutionScope.getContributedFunctionsAndConstructors(
+            name,
+            location,
+            scopeTower.syntheticScopes,
+            resolutionScope
+        ).map {
+            createCandidateDescriptor(it, dispatchReceiver = null)
+        }
     }
 
     override fun recordLookup(name: Name) {
@@ -336,6 +369,44 @@ private fun KotlinType?.getInnerConstructors(name: Name, location: LookupLocatio
     return classifierDescriptor?.constructors?.filter { it.dispatchReceiverParameter != null } ?: emptyList()
 }
 
+/**
+ * Returns pair:
+ *  - first component contains not deprecated descriptors
+ *  - second component contains deprecated ones
+ */
+private fun ResolutionScope.getContributedFunctionsAndConstructorsWithDeprecation(
+    name: Name,
+    location: LookupLocation,
+    syntheticScopes: SyntheticScopes,
+    scope: ResolutionScope
+): Pair<Collection<FunctionDescriptor>, Collection<FunctionDescriptor>> {
+    val notDeprecatedDescriptors = ArrayList<FunctionDescriptor>(getContributedFunctions(name, location))
+    val deprecatedDescriptors = ArrayList<FunctionDescriptor>()
+
+    val (classifier, isClassifierVisibilityDeprecated) = if (this is LexicalChainedScope) {
+        this.getContributedClassifierWithDeprecationStatus(name, location) ?: null to false
+    } else {
+        this.getContributedClassifier(name, location) to false
+    }
+
+    val callableConstructors = when (classifier) {
+        is TypeAliasDescriptor -> if (classifier.canHaveCallableConstructors) classifier.constructors else emptyList()
+        is ClassDescriptor -> if (classifier.canHaveCallableConstructors) classifier.constructors else emptyList()
+        else -> emptyList()
+    }
+
+    if (isClassifierVisibilityDeprecated)
+        callableConstructors.filterTo(deprecatedDescriptors) { it.dispatchReceiverParameter == null }
+    else
+        callableConstructors.filterTo(notDeprecatedDescriptors) { it.dispatchReceiverParameter == null }
+
+    notDeprecatedDescriptors.addAll(syntheticScopes.collectSyntheticStaticFunctions(scope, name, location))
+    notDeprecatedDescriptors.addAll(syntheticScopes.collectSyntheticConstructors(scope, name, location))
+
+    return notDeprecatedDescriptors to deprecatedDescriptors
+}
+
+
 private fun ResolutionScope.getContributedFunctionsAndConstructors(
     name: Name,
     location: LookupLocation,
@@ -359,6 +430,17 @@ private fun ResolutionScope.getContributedFunctionsAndConstructors(
     return result.toList()
 }
 
+private fun ResolutionScope.getContributedObjectVariablesWithDeprecation(name: Name, location: LookupLocation): Collection<Pair<VariableDescriptor, Boolean>> {
+    val (classifier, isClassifierVisibilityDeprecated) = if (this is LexicalChainedScope) {
+        this.getContributedClassifierWithDeprecationStatus(name, location) ?: null to false
+    } else {
+        this.getContributedClassifier(name, location) to false
+    }
+
+    val objectDescriptor = getFakeDescriptorForObject(classifier)
+
+    return if (objectDescriptor != null) listOf(objectDescriptor to isClassifierVisibilityDeprecated) else emptyList()
+}
 
 private fun ResolutionScope.getContributedObjectVariables(name: Name, location: LookupLocation): Collection<VariableDescriptor> {
     val objectDescriptor = getFakeDescriptorForObject(getContributedClassifier(name, location))

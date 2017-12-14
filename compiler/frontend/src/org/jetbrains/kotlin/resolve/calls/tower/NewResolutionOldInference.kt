@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.Call
 import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DeprecationResolver
 import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
@@ -287,14 +288,21 @@ class NewResolutionOldInference(
                                 error.message
                             )
                         )
+
                         is NestedClassViaInstanceReference -> tracing.nestedClassAccessViaInstanceReference(
                             resolvedCall.trace,
                             error.classDescriptor,
                             resolvedCall.explicitReceiverKind
                         )
+
                         is ErrorDescriptorDiagnostic -> {
                             // todo
                             //  return@map null
+                        }
+
+                        is ResolvedUsingDeprecatedVisbility -> {
+                            resolvedCall.trace.record(BindingContext.DEPRECATED_SHORT_NAME_ACCESS, resolvedCall.call.callElement)
+                            resolvedCall.trace.report(Errors.DEPRECATED_ACCESS_BY_SHORT_NAME.on(resolvedCall.call.callElement, resolvedCall.resultingDescriptor))
                         }
                     }
                 }

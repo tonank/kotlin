@@ -15106,6 +15106,129 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/upperBoundViolated.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("compiler/testData/diagnostics/tests/objects/deprecation")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class Deprecation extends AbstractDiagnosticsTest {
+                public void testAllFilesPresentInDeprecation() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/objects/deprecation"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+                }
+
+                @TestMetadata("callableReferencesComplexCasesWithQualificationOld.kt")
+                public void testCallableReferencesComplexCasesWithQualificationOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/callableReferencesComplexCasesWithQualificationOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("callableReferencesNew.kt")
+                public void testCallableReferencesNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/callableReferencesNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("callableReferencesOld.kt")
+                public void testCallableReferencesOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/callableReferencesOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("callableReferencesOldComplexCases.kt")
+                public void testCallableReferencesOldComplexCases() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/callableReferencesOldComplexCases.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("callableReferencesWithQualificationNew.kt")
+                public void testCallableReferencesWithQualificationNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/callableReferencesWithQualificationNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("callableReferencesWithQualificationOld.kt")
+                public void testCallableReferencesWithQualificationOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/callableReferencesWithQualificationOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("classifierFromCompanionObjectNew.kt")
+                public void testClassifierFromCompanionObjectNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/classifierFromCompanionObjectNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("classifierFromCompanionObjectOld.kt")
+                public void testClassifierFromCompanionObjectOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/classifierFromCompanionObjectOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("classifierFromCompanionObjectWithQualificationNew.kt")
+                public void testClassifierFromCompanionObjectWithQualificationNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/classifierFromCompanionObjectWithQualificationNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("classifierFromCompanionObjectWithQualificationOld.kt")
+                public void testClassifierFromCompanionObjectWithQualificationOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/classifierFromCompanionObjectWithQualificationOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("classifierIsVisibleByTwoPaths.kt")
+                public void testClassifierIsVisibleByTwoPaths() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/classifierIsVisibleByTwoPaths.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("inheritedFromDeprecatedNew.kt")
+                public void testInheritedFromDeprecatedNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/inheritedFromDeprecatedNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("inheritedFromDeprecatedOld.kt")
+                public void testInheritedFromDeprecatedOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/inheritedFromDeprecatedOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("inheritedFromDeprecatedWithQualificationNew.kt")
+                public void testInheritedFromDeprecatedWithQualificationNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/inheritedFromDeprecatedWithQualificationNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("inheritedFromDeprecatedWithQualificationOld.kt")
+                public void testInheritedFromDeprecatedWithQualificationOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/inheritedFromDeprecatedWithQualificationOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("useDeprecatedConstructorNew.kt")
+                public void testUseDeprecatedConstructorNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/useDeprecatedConstructorNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("useDeprecatedConstructorOld.kt")
+                public void testUseDeprecatedConstructorOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/useDeprecatedConstructorOld.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("useDeprecatedConstructorWithQualificationNew.kt")
+                public void testUseDeprecatedConstructorWithQualificationNew() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/useDeprecatedConstructorWithQualificationNew.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("useDeprecatedConstructorWithQualificationOld.kt")
+                public void testUseDeprecatedConstructorWithQualificationOld() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/objects/deprecation/useDeprecatedConstructorWithQualificationOld.kt");
+                    doTest(fileName);
+                }
+            }
         }
 
         @TestMetadata("compiler/testData/diagnostics/tests/operatorRem")

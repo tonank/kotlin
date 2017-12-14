@@ -76,6 +76,7 @@ enum class LanguageFeature(
     ProperForInArrayLoopRangeVariableAssignmentSemantic(KOTLIN_1_3),
     NestedClassesInAnnotations(KOTLIN_1_3),
     JvmStaticInInterface(KOTLIN_1_3),
+    ProhibitVisibilityOfNestedClassifiersFromSupertypesOfCompanion(KOTLIN_1_3),
 
     StrictJavaNullabilityAssertions(sinceVersion = null, defaultState = State.DISABLED),
 

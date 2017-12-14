@@ -81,6 +81,34 @@ fun LexicalScope.findLocalVariable(name: Name): VariableDescriptor? {
 fun HierarchicalScope.findClassifier(name: Name, location: LookupLocation): ClassifierDescriptor? =
     findFirstFromMeAndParent { it.getContributedClassifier(name, location) }
 
+fun HierarchicalScope.allImportPathsAreDeprecated(targetClassifier: ClassifierDescriptor, location: LookupLocation): Boolean =
+    collectAllWithDeprecationStatus(targetClassifier.name, location)
+        .filter { it.first == targetClassifier }
+        .all { (_, isDeprecated) -> isDeprecated }
+
+fun HierarchicalScope.findFirstClassifierWithDeprecationStatus(name: Name, location: LookupLocation): Pair<ClassifierDescriptor?, Boolean> {
+    val pair = findFirstFromMeAndParent { it.getContributedClassifierWithDeprecationStatus(name, location) }
+    return pair ?: null to false
+}
+
+fun HierarchicalScope.getContributedClassifierWithDeprecationStatus(
+    name: Name,
+    location: LookupLocation
+): Pair<ClassifierDescriptor, Boolean>? {
+    return if (this is LexicalChainedScope) {
+        getContributedClassifierWithDeprecationStatus(name, location)
+    } else {
+        getContributedClassifier(name, location)?.let { it to false }
+    }
+}
+
+fun HierarchicalScope.collectAllWithDeprecationStatus(
+    name: Name,
+    location: LookupLocation
+): Collection<Pair<ClassifierDescriptor, Boolean>> {
+    return collectAllFromMeAndParent { listOfNotNull(it.getContributedClassifierWithDeprecationStatus(name, location)) }
+}
+
 fun HierarchicalScope.findPackage(name: Name): PackageViewDescriptor? = findFirstFromImportingScopes { it.getContributedPackage(name) }
 
 fun HierarchicalScope.collectVariables(name: Name, location: LookupLocation): Collection<VariableDescriptor> =

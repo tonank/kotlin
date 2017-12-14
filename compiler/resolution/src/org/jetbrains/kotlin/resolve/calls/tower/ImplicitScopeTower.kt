@@ -110,3 +110,5 @@ object HiddenDescriptor : ResolutionDiagnostic(HIDDEN)
 object InvokeConventionCallNoOperatorModifier : ResolutionDiagnostic(CONVENTION_ERROR)
 object InfixCallNoInfixModifier : ResolutionDiagnostic(CONVENTION_ERROR)
 object DeprecatedUnaryPlusAsPlus : ResolutionDiagnostic(CONVENTION_ERROR)
+
+object ResolvedUsingDeprecatedVisbility : ResolutionDiagnostic(RESOLVED_LOW_PRIORITY)
