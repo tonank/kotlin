@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.config
 
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.name.FqName
 
 object CommonConfigurationKeys {
     @JvmField
