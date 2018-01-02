@@ -1779,6 +1779,12 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
             doTest(fileName);
         }
 
+        @TestMetadata("bodyUsageInSameModule.kt")
+        public void testBodyUsageInSameModule() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/testsWithStdLib/experimental/bodyUsageInSameModule.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("bodyUsages.kt")
         public void testBodyUsages() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/testsWithStdLib/experimental/bodyUsages.kt");
@@ -1818,6 +1824,12 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
         @TestMetadata("incorrectUseExperimental.kt")
         public void testIncorrectUseExperimental() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/testsWithStdLib/experimental/incorrectUseExperimental.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("indirectBodyUsageInAnotherModule.kt")
+        public void testIndirectBodyUsageInAnotherModule() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/testsWithStdLib/experimental/indirectBodyUsageInAnotherModule.kt");
             doTest(fileName);
         }
 
