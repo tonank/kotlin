@@ -80,18 +80,10 @@ abstract class TargetPlatform(val platformName: String) {
 }
 
 private val DEFAULT_DECLARATION_CHECKERS = listOf(
-    DataClassDeclarationChecker(),
-    ConstModifierChecker,
-    UnderscoreChecker,
-    InlineParameterChecker,
-    InfixModifierChecker(),
-    SinceKotlinAnnotationValueChecker,
-    RequireKotlinAnnotationValueChecker,
-    ReifiedTypeParameterAnnotationChecker(),
-    DynamicReceiverChecker,
-    DelegationChecker(),
-    KClassWithIncorrectTypeArgumentChecker,
-    SuspendOperatorsCheckers
+    DataClassDeclarationChecker(), ConstModifierChecker, UnderscoreChecker, InlineParameterChecker, InfixModifierChecker(),
+    SinceKotlinAnnotationValueChecker, RequireKotlinAnnotationValueChecker, ReifiedTypeParameterAnnotationChecker(),
+    DynamicReceiverChecker, DelegationChecker(), KClassWithIncorrectTypeArgumentChecker, SuspendOperatorsCheckers,
+    ExperimentalUsageChecker.Overrides
 )
 
 private val DEFAULT_CALL_CHECKERS = listOf(
@@ -108,7 +100,7 @@ private val DEFAULT_CLASSIFIER_USAGE_CHECKERS = listOf(
     ExperimentalUsageChecker.ClassifierUsage
 )
 private val DEFAULT_ANNOTATION_CHECKERS = listOf<AdditionalAnnotationChecker>(
-        ExperimentalUsageChecker.ExperimentalDeclarationChecker
+    ExperimentalUsageChecker.ExperimentalDeclarationChecker
 )
 
 
