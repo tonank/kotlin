@@ -11,19 +11,28 @@ val gradleJars = listOf(
 )
 
 val platform = extra["versions.intellijSdk"].toString().substringBefore('.')
-if (platform == "173") {
-    extra["versions.jar.streamex"] = "0.6.5"
-    extra["versions.jar.gson"] = "2.8.2"
-    for (jar in gradleJars) {
-        extra["versions.jar.$jar"] = "4.0"
+when (platform) {
+    "173" -> {
+        extra["versions.jar.streamex"] = "0.6.5"
+        extra["versions.jar.gson"] = "2.8.2"
+        for (jar in gradleJars) {
+            extra["versions.jar.$jar"] = "4.0"
+        }
+        extra["ignore.jar.lombok-ast-0.2.3"] = true
     }
-    extra["ignore.jar.lombok-ast-0.2.3"] = true
-}
-else {
-    extra["versions.jar.streamex"] = "0.6.2"
-    extra["versions.jar.gson"] = "2.5"
-    for (jar in gradleJars) {
-        extra["versions.jar.$jar"] = "3.5"
+    "172" -> {
+        extra["versions.jar.streamex"] = "0.6.2"
+        extra["versions.jar.gson"] = "2.5"
+        for (jar in gradleJars) {
+            extra["versions.jar.$jar"] = "3.5"
+        }
+    }
+    "171" -> {
+        extra["versions.jar.streamex"] = "0.6.2"
+        extra["versions.jar.gson"] = "2.5"
+        for (jar in gradleJars) {
+            extra["versions.jar.$jar"] = "3.3"
+        }
     }
 }
 
