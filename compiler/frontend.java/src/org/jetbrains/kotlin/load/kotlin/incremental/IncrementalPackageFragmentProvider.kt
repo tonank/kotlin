@@ -86,12 +86,14 @@ class IncrementalPackageFragmentProvider(
 
                             val partName = JvmClassName.byInternalName(internalName)
                             val jvmBinaryClass =
-                                    kotlinClassFinder.findKotlinClass(ClassId.topLevel(partName.fqNameForTopLevelClassMaybeWithDollars))
+                                kotlinClassFinder.findKotlinClass(ClassId.topLevel(partName.fqNameForTopLevelClassMaybeWithDollars))
 
                             DeserializedPackageMemberScope(
-                                    this, packageProto, nameResolver,
-                                    JvmPackagePartSource(partName, facadeName, knownJvmBinaryClass = jvmBinaryClass),
-                                    deserializationComponents, classNames = { emptyList() }
+                                this, packageProto, nameResolver,
+                                JvmPackagePartSource(
+                                    partName, facadeName, packageProto, nameResolver, knownJvmBinaryClass = jvmBinaryClass
+                                ),
+                                deserializationComponents, classNames = { emptyList() }
                             )
                         }
                     }

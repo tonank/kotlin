@@ -20,28 +20,36 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
+import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.IncompatibleVersionErrorData
+import org.jetbrains.kotlin.serialization.deserialization.NameResolver
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
 class JvmPackagePartSource(
-        val className: JvmClassName,
-        val facadeClassName: JvmClassName?,
-        override val incompatibility: IncompatibleVersionErrorData<JvmMetadataVersion>? = null,
-        override val isPreReleaseInvisible: Boolean = false,
-        val knownJvmBinaryClass: KotlinJvmBinaryClass? = null
+    val className: JvmClassName,
+    val facadeClassName: JvmClassName?,
+    val packageProto: ProtoBuf.Package,
+    val nameResolver: NameResolver,
+    override val incompatibility: IncompatibleVersionErrorData<JvmMetadataVersion>? = null,
+    override val isPreReleaseInvisible: Boolean = false,
+    val knownJvmBinaryClass: KotlinJvmBinaryClass? = null
 ) : DeserializedContainerSource {
     constructor(
-            kotlinClass: KotlinJvmBinaryClass,
-            incompatibility: IncompatibleVersionErrorData<JvmMetadataVersion>? = null,
-            isPreReleaseInvisible: Boolean = false
+        kotlinClass: KotlinJvmBinaryClass,
+        packageProto: ProtoBuf.Package,
+        nameResolver: NameResolver,
+        incompatibility: IncompatibleVersionErrorData<JvmMetadataVersion>? = null,
+        isPreReleaseInvisible: Boolean = false
     ) : this(
-            JvmClassName.byClassId(kotlinClass.classId),
-            kotlinClass.classHeader.multifileClassName?.let {
-                if (it.isNotEmpty()) JvmClassName.byInternalName(it) else null
-            },
-            incompatibility,
-            isPreReleaseInvisible,
-            kotlinClass
+        JvmClassName.byClassId(kotlinClass.classId),
+        kotlinClass.classHeader.multifileClassName?.let {
+            if (it.isNotEmpty()) JvmClassName.byInternalName(it) else null
+        },
+        packageProto,
+        nameResolver,
+        incompatibility,
+        isPreReleaseInvisible,
+        kotlinClass
     )
 
     override val presentableString: String
