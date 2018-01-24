@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
-import org.jetbrains.kotlin.resolve.underlyingRepresentationForInlineClass
+import org.jetbrains.kotlin.resolve.underlyingRepresentation
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 import org.jetbrains.kotlin.utils.DO_NOTHING_3
@@ -130,8 +130,16 @@ fun <T : Any> mapType(
 
         descriptor is ClassDescriptor -> {
             if (descriptor.isInline && !mode.needInlineClassWrapping) {
-                val underlyingType = descriptor.underlyingRepresentationForInlineClass().type
-                return mapType(underlyingType, factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType)
+                val underlyingType = descriptor.underlyingRepresentation()?.type
+                if (underlyingType != null) {
+                    if (!kotlinType.isMarkedNullable) {
+                        return mapType(underlyingType, factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType)
+                    }
+
+                    if (!underlyingType.isMarkedNullable && !KotlinBuiltIns.isPrimitiveType(underlyingType)) {
+                        return mapType(underlyingType, factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType)
+                    }
+                }
             }
 
             val jvmType =
