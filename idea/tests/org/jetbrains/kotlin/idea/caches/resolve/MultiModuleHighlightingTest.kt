@@ -31,17 +31,22 @@ import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.analyzer.ResolverForModuleComputationTracker
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.config.LanguageVersion
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinCommonCompilerArgumentsHolder
 import org.jetbrains.kotlin.idea.completion.test.withServiceRegistered
 import org.jetbrains.kotlin.idea.facet.KotlinFacetConfiguration
 import org.jetbrains.kotlin.idea.facet.KotlinFacetType
+import org.jetbrains.kotlin.idea.framework.JSLibraryKind
 import org.jetbrains.kotlin.idea.project.KotlinCodeBlockModificationListener
 import org.jetbrains.kotlin.idea.project.KotlinModuleModificationTracker
+import org.jetbrains.kotlin.idea.project.getLanguageVersionSettings
+import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.test.PluginTestCaseBase
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.idea.util.projectStructure.sdk
 import org.jetbrains.kotlin.samWithReceiver.SamWithReceiverCommandLineProcessor.Companion.ANNOTATION_OPTION
 import org.jetbrains.kotlin.samWithReceiver.SamWithReceiverCommandLineProcessor.Companion.PLUGIN_ID
+import org.jetbrains.kotlin.test.MockLibraryUtil
 import org.jetbrains.kotlin.test.TestJdkKind.FULL_JDK
 
 open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
@@ -215,6 +220,35 @@ open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
         checkHighlightingInAllFiles()
     }
 
+    fun testJvmExperimentalLibrary() {
+        val lib = MockLibraryUtil.compileJvmLibraryToJar(
+            testDataPath + "${getTestName(true)}/lib", "lib",
+            extraOptions = listOf(
+                "-Xskip-runtime-version-check",
+                "-language-version",
+                "1.3",
+                "-Xexperimental=lib.ExperimentalAPI"
+            )
+        )
+        // TODO
+        // KotlinCommonCompilerArgumentsHolder.getInstance(project).settings.skipMetadataVersionCheck = true
+        module("usage").addLibrary(lib)
+        checkHighlightingInAllFiles()
+    }
+
+    fun testJsExperimentalLibrary() {
+        val lib = MockLibraryUtil.compileJsLibraryToJar(
+            testDataPath + "${getTestName(true)}/lib", "lib", false,
+            extraOptions = listOf(
+                "-Xskip-runtime-version-check",
+                "-language-version",
+                "1.3",
+                "-Xexperimental=lib.ExperimentalAPI"
+            )
+        )
+        module("usage").addLibrary(lib, kind = JSLibraryKind)
+        checkHighlightingInAllFiles()
+    }
 
     private fun Module.setupKotlinFacet(configure: KotlinFacetConfiguration.() -> Unit) = apply {
         runWriteAction {
