@@ -58,7 +58,7 @@ abstract class AbstractMavenConfigureProjectByChangingFileTest : AbstractConfigu
 
             val pomFile = File("$root/$dir", MavenConstants.POM_XML)
             if (pomFile.readText().contains("<target>9</target>")) {
-                return PluginTestCaseBase.mockJdk9()
+                return PluginTestCaseBase.MOCK_JDK9
             }
         }
 

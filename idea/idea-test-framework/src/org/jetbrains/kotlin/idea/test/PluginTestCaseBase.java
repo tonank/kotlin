@@ -36,6 +36,11 @@ public class PluginTestCaseBase {
     public static final String TEST_DATA_DIR = "idea/testData";
     public static final String TEST_DATA_PROJECT_RELATIVE = "/" + TEST_DATA_DIR;
 
+    public static Sdk MOCK_JDK = mockJdk();
+    public static Sdk FULL_JDK_9 = fullJdk9();
+    public static Sdk FULL_JDK = fullJdk();
+    public static Sdk MOCK_JDK9 = mockJdk9();
+
     private PluginTestCaseBase() {
     }
 
@@ -73,8 +78,16 @@ public class PluginTestCaseBase {
 
     @TestOnly
     @NotNull
-    public static Sdk mockJdk9() {
+    private static Sdk mockJdk9() {
         return getSdk("compiler/testData/mockJDK9/jre", "9");
+    }
+
+    @NotNull
+    private static Sdk fullJdk9() {
+        File jre9 = KotlinTestUtils.getJdk9HomeIfPossible();
+        assert jre9 != null : "JDK_19 environment variable is not set";
+        VfsRootAccess.allowRootAccess(jre9.getPath());
+        return getSdk(jre9.getPath(), "Full JDK 9");
     }
 
     @NotNull
@@ -88,14 +101,11 @@ public class PluginTestCaseBase {
     public static Sdk jdk(@NotNull TestJdkKind kind) {
         switch (kind) {
             case MOCK_JDK:
-                return mockJdk();
+                return MOCK_JDK;
             case FULL_JDK_9:
-                File jre9 = KotlinTestUtils.getJdk9HomeIfPossible();
-                assert jre9 != null : "JDK_19 environment variable is not set";
-                VfsRootAccess.allowRootAccess(jre9.getPath());
-                return getSdk(jre9.getPath(), "Full JDK 9");
+                return FULL_JDK_9;
             case FULL_JDK:
-                return fullJdk();
+                return FULL_JDK;
             default:
                 throw new UnsupportedOperationException(kind.toString());
         }

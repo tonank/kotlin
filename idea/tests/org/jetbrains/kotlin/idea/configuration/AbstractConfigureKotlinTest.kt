@@ -71,7 +71,7 @@ abstract class AbstractConfigureKotlinTest : PlatformTestCase() {
         ApplicationManager.getApplication().runWriteAction {
             ProjectJdkTable.getInstance().addJdk(PluginTestCaseBase.mockJdk6())
             ProjectJdkTable.getInstance().addJdk(PluginTestCaseBase.mockJdk8())
-            ProjectJdkTable.getInstance().addJdk(PluginTestCaseBase.mockJdk9())
+            ProjectJdkTable.getInstance().addJdk(PluginTestCaseBase.MOCK_JDK9)
         }
 
         PluginTestCaseBase.clearSdkTable(testRootDisposable)

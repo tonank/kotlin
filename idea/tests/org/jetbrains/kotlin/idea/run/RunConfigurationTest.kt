@@ -54,6 +54,12 @@ class RunConfigurationTest: KotlinCodeInsightTestCase() {
     fun getTestProject() = myProject!!
     override fun getModule() = myModule!!
 
+    override fun setUpProject() {
+        // Call <clinit> to initialize SDKs
+        PluginTestCaseBase.getTestDataPathBase()
+        super.setUpProject()
+    }
+
     fun testMainInTest() {
         val createResult = configureModule(moduleDirPath("module"), getTestProject().baseDir!!)
         ConfigLibraryUtil.configureKotlinRuntimeAndSdk(createResult.module, PluginTestCaseBase.mockJdk())
@@ -171,11 +177,11 @@ class RunConfigurationTest: KotlinCodeInsightTestCase() {
     }
 
     fun testWithModuleForJdk9() {
-        checkModuleInfoName("MAIN", PluginTestCaseBase.mockJdk9())
+        checkModuleInfoName("MAIN", PluginTestCaseBase.MOCK_JDK9)
     }
 
     fun testWithModuleForJdk9WithoutModuleInfo() {
-        checkModuleInfoName(null, PluginTestCaseBase.mockJdk9())
+        checkModuleInfoName(null, PluginTestCaseBase.MOCK_JDK9)
     }
 
     private fun checkModuleInfoName(moduleName: String?, sdk: Sdk) {

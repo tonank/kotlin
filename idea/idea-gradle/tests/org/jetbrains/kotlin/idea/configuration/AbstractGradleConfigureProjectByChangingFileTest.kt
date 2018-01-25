@@ -69,7 +69,7 @@ abstract class AbstractGradleConfigureProjectByChangingFileTest : AbstractConfig
             val (before, _) = beforeAfterFiles
             val gradleFile = File(before)
             if (gradleFile.readText().contains("1.9")) {
-                return PluginTestCaseBase.mockJdk9()
+                return PluginTestCaseBase.MOCK_JDK9
             }
         }
 

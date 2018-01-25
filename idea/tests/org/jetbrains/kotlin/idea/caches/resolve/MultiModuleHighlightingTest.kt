@@ -45,6 +45,12 @@ import org.jetbrains.kotlin.samWithReceiver.SamWithReceiverCommandLineProcessor.
 import org.jetbrains.kotlin.test.TestJdkKind.FULL_JDK
 
 open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
+    override fun setUpProject() {
+        // Call <clinit> to initialize SDKs
+        PluginTestCaseBase.getTestDataPathBase()
+        super.setUpProject()
+    }
+
     override fun getTestDataPath() = PluginTestCaseBase.getTestDataPathBase() + "/multiModuleHighlighting/"
 
     fun testVisibility() {
