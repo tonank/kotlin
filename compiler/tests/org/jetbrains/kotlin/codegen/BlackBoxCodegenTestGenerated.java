@@ -10304,6 +10304,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/inlineClasses/basicInlineClassBox.kt");
             doTest(fileName);
         }
+
+        @TestMetadata("useInlineFunctionInsideInlineClass.kt")
+        public void testUseInlineFunctionInsideInlineClass() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/inlineClasses/useInlineFunctionInsideInlineClass.kt");
+            doTest(fileName);
+        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/innerNested")
