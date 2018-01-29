@@ -52,6 +52,7 @@ public final class JvmAbi {
     public static final String LOCAL_VARIABLE_NAME_PREFIX_INLINE_FUNCTION = "$i$f$";
 
     public static final String ERASED_INLINE_CLASS_SUFFIX = "$" + ERASED_INLINE_CLASS_NAME;
+    public static final String ERASED_INLINE_CLASS_CONSTRUCTOR_NAME = "constructor";
 
     @NotNull
     public static String getSyntheticMethodNameForAnnotatedProperty(@NotNull Name propertyName) {

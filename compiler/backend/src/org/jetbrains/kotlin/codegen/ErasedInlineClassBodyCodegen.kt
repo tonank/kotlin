@@ -9,6 +9,8 @@ import com.intellij.util.ArrayUtil
 import org.jetbrains.kotlin.codegen.context.ClassContext
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.resolve.jvm.diagnostics.ConstructorOfErasedInlineClassOrigin
+import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.Opcodes
 
 class ErasedInlineClassBodyCodegen(
@@ -25,6 +27,21 @@ class ErasedInlineClassBodyCodegen(
             null, "java/lang/Object", ArrayUtil.EMPTY_STRING_ARRAY
         )
         v.visitSource(myClass.containingKtFile.name, null)
+    }
+
+    override fun generateConstructors() {
+        val constructor = descriptor.unsubstitutedPrimaryConstructor ?: return
+        functionCodegen.generateMethod(
+            ConstructorOfErasedInlineClassOrigin(constructor), constructor, object : FunctionGenerationStrategy.CodegenBased(state) {
+                override fun doGenerateBody(codegen: ExpressionCodegen, signature: JvmMethodSignature) {
+                    val inlinedValueType = state.typeMapper.mapType(descriptor)
+                    val iv = codegen.v
+                    iv.load(0, inlinedValueType)
+                    iv.areturn(inlinedValueType)
+                }
+            }
+
+        )
     }
 
     override fun generateKotlinMetadataAnnotation() {

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.resolve
 
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
 fun ClassDescriptor.underlyingRepresentation(): ValueParameterDescriptor? {
@@ -20,3 +21,5 @@ fun ClassDescriptor.underlyingRepresentationForInlineClass(): ValueParameterDesc
 
     return underlyingRepresentation()!!
 }
+
+fun DeclarationDescriptor.isInlineClass() = this is ClassDescriptor && this.isInline

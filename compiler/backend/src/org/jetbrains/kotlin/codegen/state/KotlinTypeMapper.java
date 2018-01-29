@@ -264,6 +264,11 @@ public class KotlinTypeMapper {
         return containingClassesInfo;
     }
 
+    public static boolean isCallToJvmConstructor(@NotNull FunctionDescriptor descriptor) {
+        return descriptor instanceof ConstructorDescriptor &&
+               !InlineClassesUtilsKt.isInlineClass(descriptor.getContainingDeclaration());
+    }
+
     @NotNull
     private static ClassId getContainerClassIdForClassDescriptor(@NotNull ClassDescriptor classDescriptor) {
         ClassId classId = DescriptorUtilsKt.getClassId(classDescriptor);
@@ -671,7 +676,8 @@ public class KotlinTypeMapper {
 
     @NotNull
     public CallableMethod mapToCallableMethod(@NotNull FunctionDescriptor descriptor, boolean superCall) {
-        if (descriptor instanceof ConstructorDescriptor) {
+        // constructor for erased inline class is an ordinary static function `constructor`
+        if (isCallToJvmConstructor(descriptor)) {
             JvmMethodSignature method = mapSignatureSkipGeneric(descriptor.getOriginal());
             Type owner = mapOwner(descriptor);
             String defaultImplDesc = mapDefaultMethod(descriptor.getOriginal(), OwnerKind.IMPLEMENTATION).getDescriptor();
@@ -844,10 +850,14 @@ public class KotlinTypeMapper {
     }
 
     @NotNull
-    private String mapFunctionName(@NotNull FunctionDescriptor descriptor) {
+    private String mapFunctionName(@NotNull FunctionDescriptor descriptor, @NotNull OwnerKind kind) {
         if (!(descriptor instanceof JavaCallableMemberDescriptor)) {
             String platformName = getJvmName(descriptor);
             if (platformName != null) return platformName;
+        }
+
+        if (descriptor instanceof ConstructorDescriptor && OwnerKind.ERASED_INLINE_CLASS == kind) {
+            return JvmAbi.ERASED_INLINE_CLASS_CONSTRUCTOR_NAME;
         }
 
         String nameForSpecialFunction = SpecialBuiltinMembers.getJvmMethodNameIfSpecial(descriptor);
@@ -1061,7 +1071,8 @@ public class KotlinTypeMapper {
 
         if (f instanceof ClassConstructorDescriptor) {
             sw.writeParametersStart();
-            writeAdditionalConstructorParameters((ClassConstructorDescriptor) f, sw);
+            ClassConstructorDescriptor constructorDescriptor = (ClassConstructorDescriptor) f;
+            writeAdditionalConstructorParameters(constructorDescriptor, sw);
 
             for (ValueParameterDescriptor parameter : valueParameters) {
                 writeParameter(sw, parameter.getType(), f);
@@ -1071,7 +1082,14 @@ public class KotlinTypeMapper {
                 writeParameter(sw, JvmMethodParameterKind.CONSTRUCTOR_MARKER, DEFAULT_CONSTRUCTOR_MARKER);
             }
 
-            writeVoidReturn(sw);
+            if (kind == OwnerKind.ERASED_INLINE_CLASS) {
+                sw.writeReturnType();
+                sw.writeAsmType(mapType(constructorDescriptor.getContainingDeclaration()));
+                sw.writeReturnTypeEnd();
+            }
+            else {
+                writeVoidReturn(sw);
+            }
         }
         else {
             CallableMemberDescriptor directMember = DescriptorUtils.getDirectMember(f);
@@ -1116,7 +1134,7 @@ public class KotlinTypeMapper {
             sw.writeReturnTypeEnd();
         }
 
-        JvmMethodGenericSignature signature = sw.makeJvmMethodSignature(mapFunctionName(f));
+        JvmMethodGenericSignature signature = sw.makeJvmMethodSignature(mapFunctionName(f, kind));
 
         if (kind != OwnerKind.DEFAULT_IMPLS && !hasSpecialBridge) {
             SpecialSignatureInfo specialSignatureInfo = BuiltinMethodsWithSpecialGenericSignature.getSpecialSignatureInfo(f);

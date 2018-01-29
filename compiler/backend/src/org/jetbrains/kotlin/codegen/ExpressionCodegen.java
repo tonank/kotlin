@@ -2071,7 +2071,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         ResolvedCall<?> resolvedCall = CallUtilKt.getResolvedCallWithAssert(expression, bindingContext);
         FunctionDescriptor descriptor = accessibleFunctionDescriptor(resolvedCall);
 
-        if (descriptor instanceof ConstructorDescriptor) {
+        if (KotlinTypeMapper.isCallToJvmConstructor(descriptor)) {
             return generateNewCall(expression, resolvedCall);
         }
 

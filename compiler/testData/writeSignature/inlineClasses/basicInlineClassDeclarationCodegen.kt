@@ -28,3 +28,7 @@ inline class Foo(val x: Int) {
 // method: Foo$Erased::withInlineClassType
 // jvm signature: (II)V
 // generic signature: null
+
+// method: Foo$Erased::constructor
+// jvm signature: (I)I
+// generic signature: null
