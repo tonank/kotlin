@@ -120,7 +120,7 @@ class KotlinPluginUpdater(val propertiesComponent: PropertiesComponent) : Dispos
 
     private fun updateCheck(callback: (PluginUpdateStatus) -> Boolean) {
         var updateStatus: PluginUpdateStatus
-        if (KotlinPluginUtil.isSnapshotVersion()) {
+        if (KotlinPluginUtil.isSnapshotVersionOrBundled()) {
             updateStatus = PluginUpdateStatus.LatestVersionInstalled
         }
         else {
@@ -159,7 +159,7 @@ class KotlinPluginUpdater(val propertiesComponent: PropertiesComponent) : Dispos
 
     private fun checkUpdatesInMainRepository(): PluginUpdateStatus {
         val buildNumber = ApplicationInfo.getInstance().apiVersion
-        val currentVersion = KotlinPluginUtil.getPluginVersion()
+        val currentVersion = KotlinPluginUtil.getPluginVersion() ?: return PluginUpdateStatus.LatestVersionInstalled
         val os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8)
         val uid = PermanentInstallationID.get()
         val url = "https://plugins.jetbrains.com/plugins/list?pluginId=6954&build=$buildNumber&pluginVersion=$currentVersion&os=$os&uuid=$uid"
@@ -194,7 +194,8 @@ class KotlinPluginUpdater(val propertiesComponent: PropertiesComponent) : Dispos
     }
 
     private fun updateIfNotLatest(kotlinPlugin: IdeaPluginDescriptor, host: String?): PluginUpdateStatus {
-        if (VersionComparatorUtil.compare(kotlinPlugin.version, KotlinPluginUtil.getPluginVersion()) <= 0) {
+        val pluginVersion = KotlinPluginUtil.getPluginVersion()
+        if (pluginVersion == null || VersionComparatorUtil.compare(kotlinPlugin.version, pluginVersion) <= 0) {
             return PluginUpdateStatus.LatestVersionInstalled
         }
 

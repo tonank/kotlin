@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.idea.actions
 
+import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -23,12 +24,17 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import org.jetbrains.kotlin.idea.KotlinPluginUpdater
 import org.jetbrains.kotlin.idea.KotlinPluginUtil
+import org.jetbrains.kotlin.idea.KotlinPluginUtil.KOTLIN_PLUGIN_ID
 import org.jetbrains.kotlin.idea.PluginUpdateStatus
 import org.jetbrains.kotlin.idea.actions.ConfigurePluginUpdatesDialog.EAPChannels.EAP_1_2
 import org.jetbrains.kotlin.idea.actions.ConfigurePluginUpdatesDialog.EAPChannels.EAP_1_3
 import javax.swing.JComponent
 
 class ConfigurePluginUpdatesAction : DumbAwareAction() {
+    override fun update(e: AnActionEvent?) {
+        e?.presentation?.isEnabledAndVisible = PluginManager.getPlugin(KOTLIN_PLUGIN_ID) != null
+    }
+
     override fun actionPerformed(e: AnActionEvent) {
         ConfigurePluginUpdatesDialog(e.project).show()
     }
