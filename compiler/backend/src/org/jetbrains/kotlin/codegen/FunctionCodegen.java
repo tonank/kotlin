@@ -529,15 +529,15 @@ public class FunctionCodegen {
     ) {
         ReceiverParameterDescriptor dispatchReceiver = functionDescriptor.getDispatchReceiverParameter();
         if (functionDescriptor instanceof ConstructorDescriptor) {
-            return typeMapper.mapType(functionDescriptor);
+            return typeMapper.mapTypeAsDeclaration(functionDescriptor);
         }
         else if (dispatchReceiver != null) {
-            return typeMapper.mapType(dispatchReceiver.getType());
+            return typeMapper.mapTypeAsDeclaration(dispatchReceiver.getType());
         }
         else if (isFunctionLiteral(functionDescriptor) ||
                  isLocalFunction(functionDescriptor) ||
                  isFunctionExpression(functionDescriptor)) {
-            return typeMapper.mapType(context.getThisDescriptor());
+            return typeMapper.mapClass(context.getThisDescriptor());
         }
         else {
             return null;
