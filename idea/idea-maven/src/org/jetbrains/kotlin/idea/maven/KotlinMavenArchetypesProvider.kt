@@ -29,7 +29,7 @@ import java.net.HttpURLConnection
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
-class KotlinMavenArchetypesProvider(private val kotlinPluginVersion: String?, private val predefinedInternalMode: Boolean?) :
+class KotlinMavenArchetypesProvider(private val kotlinPluginVersion: String, private val predefinedInternalMode: Boolean?) :
     MavenArchetypesProvider {
 
     @Suppress("unused")
@@ -126,5 +126,5 @@ class KotlinMavenArchetypesProvider(private val kotlinPluginVersion: String?, pr
             disconnect()
         }
 
-    private fun versionPrefix(version: String?) = if (version != null) """^\d+\.\d+\.""".toRegex().find(version)?.value else null
+    private fun versionPrefix(version: String) = """^\d+\.\d+\.""".toRegex().find(version)?.value
 }

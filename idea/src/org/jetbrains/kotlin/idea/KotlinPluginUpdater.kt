@@ -120,7 +120,7 @@ class KotlinPluginUpdater(val propertiesComponent: PropertiesComponent) : Dispos
 
     private fun updateCheck(callback: (PluginUpdateStatus) -> Boolean) {
         var updateStatus: PluginUpdateStatus
-        if (KotlinPluginUtil.isSnapshotVersionOrBundled()) {
+        if (KotlinPluginUtil.isSnapshotVersion()) {
             updateStatus = PluginUpdateStatus.LatestVersionInstalled
         }
         else {
@@ -159,10 +159,11 @@ class KotlinPluginUpdater(val propertiesComponent: PropertiesComponent) : Dispos
 
     private fun checkUpdatesInMainRepository(): PluginUpdateStatus {
         val buildNumber = ApplicationInfo.getInstance().apiVersion
-        val currentVersion = KotlinPluginUtil.getPluginVersion() ?: return PluginUpdateStatus.LatestVersionInstalled
+        val currentVersion = KotlinPluginUtil.getPluginVersion()
         val os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8)
         val uid = PermanentInstallationID.get()
-        val url = "https://plugins.jetbrains.com/plugins/list?pluginId=6954&build=$buildNumber&pluginVersion=$currentVersion&os=$os&uuid=$uid"
+        val pluginId = KotlinPluginUtil.KOTLIN_PLUGIN_ID.idString
+        val url = "https://plugins.jetbrains.com/plugins/list?pluginId=$pluginId&build=$buildNumber&pluginVersion=$currentVersion&os=$os&uuid=$uid"
         val responseDoc = HttpRequests.request(url).connect {
             JDOMUtil.load(it.inputStream)
         }
@@ -194,8 +195,7 @@ class KotlinPluginUpdater(val propertiesComponent: PropertiesComponent) : Dispos
     }
 
     private fun updateIfNotLatest(kotlinPlugin: IdeaPluginDescriptor, host: String?): PluginUpdateStatus {
-        val pluginVersion = KotlinPluginUtil.getPluginVersion()
-        if (pluginVersion == null || VersionComparatorUtil.compare(kotlinPlugin.version, pluginVersion) <= 0) {
+        if (VersionComparatorUtil.compare(kotlinPlugin.version, KotlinPluginUtil.getPluginVersion()) <= 0) {
             return PluginUpdateStatus.LatestVersionInstalled
         }
 

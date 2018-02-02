@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.idea.actions
 
-import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -24,17 +23,12 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import org.jetbrains.kotlin.idea.KotlinPluginUpdater
 import org.jetbrains.kotlin.idea.KotlinPluginUtil
-import org.jetbrains.kotlin.idea.KotlinPluginUtil.KOTLIN_PLUGIN_ID
 import org.jetbrains.kotlin.idea.PluginUpdateStatus
 import org.jetbrains.kotlin.idea.actions.ConfigurePluginUpdatesDialog.EAPChannels.EAP_1_2
 import org.jetbrains.kotlin.idea.actions.ConfigurePluginUpdatesDialog.EAPChannels.EAP_1_3
 import javax.swing.JComponent
 
 class ConfigurePluginUpdatesAction : DumbAwareAction() {
-    override fun update(e: AnActionEvent?) {
-        e?.presentation?.isEnabledAndVisible = PluginManager.getPlugin(KOTLIN_PLUGIN_ID) != null
-    }
-
     override fun actionPerformed(e: AnActionEvent) {
         ConfigurePluginUpdatesDialog(e.project).show()
     }
@@ -107,7 +101,10 @@ class ConfigurePluginUpdatesDialog(project: Project?) : DialogWrapper(project, f
 
     private fun saveSelectedChannel(channel: Int) {
         val hosts = UpdateSettings.getInstance().storedPluginHosts
-        hosts.removeIf { it.startsWith("https://plugins.jetbrains.com/plugins/") && it.endsWith("/6954") }
+        hosts.removeIf {
+            it.startsWith("https://plugins.jetbrains.com/plugins/") &&
+                    (it.endsWith("/6954") || it.endsWith(KotlinPluginUtil.KOTLIN_PLUGIN_ID.idString))
+        }
         when (channel) {
             EAP_1_3.uiIndex -> hosts.add(EAP_1_3.url)
             EAP_1_2.uiIndex -> hosts.add(EAP_1_2.url)
@@ -125,8 +122,8 @@ class ConfigurePluginUpdatesDialog(project: Project?) : DialogWrapper(project, f
     }
 
     enum class EAPChannels(val url: String, val uiIndex: Int) {
-        EAP_1_2("https://plugins.jetbrains.com/plugins/eap-1.2/6954", 1),
-        EAP_1_3("https://plugins.jetbrains.com/plugins/eap-next/6954", 2);
+        EAP_1_2("https://plugins.jetbrains.com/plugins/eap-1.2/${KotlinPluginUtil.KOTLIN_PLUGIN_ID.idString}", 1),
+        EAP_1_3("https://plugins.jetbrains.com/plugins/eap-next/${KotlinPluginUtil.KOTLIN_PLUGIN_ID.idString}", 2);
 
         val hasChannel: Boolean get() = url in UpdateSettings.getInstance().pluginHosts
     }

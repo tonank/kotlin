@@ -7,20 +7,24 @@ package org.jetbrains.kotlin.idea;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 public class KotlinPluginUtil {
 
-    public static final PluginId KOTLIN_PLUGIN_ID = PluginId.getId("org.jetbrains.kotlin");
+    public static final PluginId KOTLIN_PLUGIN_ID = PluginManagerCore.getPluginByClassName(KotlinPluginUtil.class.getName());
 
-    @Nullable
+    @NotNull
     public static String getPluginVersion() {
         IdeaPluginDescriptor plugin = PluginManager.getPlugin(KOTLIN_PLUGIN_ID);
-        return plugin == null ? null : plugin.getVersion();
+        assert plugin != null : "Kotlin plugin not found: " + Arrays.toString(PluginManagerCore.getPlugins());
+        return plugin.getVersion();
     }
 
-    public static boolean isSnapshotVersionOrBundled() {
-        return PluginManager.getPlugin(KOTLIN_PLUGIN_ID) == null || "@snapshot@".equals(getPluginVersion());
+    public static boolean isSnapshotVersion() {
+        return "@snapshot@".equals(getPluginVersion());
     }
 }
