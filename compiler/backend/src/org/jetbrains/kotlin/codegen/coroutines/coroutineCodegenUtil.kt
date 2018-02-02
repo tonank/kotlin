@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.builtins.isBuiltinFunctionalType
 import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding
+import org.jetbrains.kotlin.codegen.inline.addFakeContinuationMarker
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
 import org.jetbrains.kotlin.codegen.topLevelClassAsmType
 import org.jetbrains.kotlin.codegen.topLevelClassInternalName
@@ -336,11 +337,11 @@ fun createMethodNodeForCoroutineContext(functionDescriptor: FunctionDescriptor):
             Opcodes.ASM5,
             Opcodes.ACC_STATIC,
             "fake",
-            Type.getMethodDescriptor(COROUTINE_CONTEXT_ASM_TYPE, CONTINUATION_ASM_TYPE),
+            Type.getMethodDescriptor(COROUTINE_CONTEXT_ASM_TYPE),
             null, null
         )
 
-    node.visitVarInsn(Opcodes.ALOAD, 0)
+    addFakeContinuationMarker(node)
 
     node.visitMethodInsn(
         Opcodes.INVOKEINTERFACE,
