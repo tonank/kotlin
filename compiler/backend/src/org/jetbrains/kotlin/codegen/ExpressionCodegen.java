@@ -3737,7 +3737,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         Type varType = getVariableTypeNoSharing(variableDescriptor);
 
-        StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
+        StackValue storeTo = sharedVarType == null ?
+                             StackValue.local(index, varType, variableDescriptor) :
+                             StackValue.shared(index, varType, variableDescriptor);
 
         storeTo.putReceiver(v, false);
         if (variableDescriptor.isLateInit()) {
@@ -3752,6 +3754,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         markLineNumber(variableDeclaration, false);
         Type resultType = initializer.type;
+        KotlinType resultKotlinType = initializer.kotlinType;
 
         if (isDelegatedLocalVariable(variableDescriptor)) {
             StackValue metadataValue = getVariableMetadataValue(variableDescriptor);
@@ -3759,15 +3762,17 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
             ResolvedCall<FunctionDescriptor> provideDelegateCall = bindingContext.get(PROVIDE_DELEGATE_RESOLVED_CALL, variableDescriptor);
             if (provideDelegateCall != null) {
-                resultType = generateProvideDelegateCallForLocalVariable(initializer, metadataValue, provideDelegateCall);
+                StackValue provideDelegateValue = generateProvideDelegateCallForLocalVariable(initializer, metadataValue, provideDelegateCall);
+                resultType = provideDelegateValue.type;
+                resultKotlinType = provideDelegateValue.kotlinType;
             }
         }
 
-        storeTo.storeSelector(resultType, null, v);
+        storeTo.storeSelector(resultType, resultKotlinType, v);
     }
 
     @NotNull
-    private Type generateProvideDelegateCallForLocalVariable(
+    private StackValue generateProvideDelegateCallForLocalVariable(
             @NotNull StackValue initializer,
             StackValue metadataValue,
             ResolvedCall<FunctionDescriptor> provideDelegateResolvedCall
@@ -3795,7 +3800,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         result.put(result.type, result.kotlinType, v);
         tempVariables.remove(arguments.get(0).asElement());
         tempVariables.remove(arguments.get(1).asElement());
-        return result.type;
+        return result;
     }
 
     @NotNull
