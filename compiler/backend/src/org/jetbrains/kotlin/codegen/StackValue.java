@@ -363,11 +363,11 @@ public abstract class StackValue {
         v.invokevirtual(methodOwner.getInternalName(), type.getClassName() + "Value", "()" + type.getDescriptor(), false);
     }
 
-    protected void coerceTo(@NotNull Type toType, @NotNull InstructionAdapter v) {
+    protected void coerceTo(@NotNull Type toType, @Nullable KotlinType toKotlinType, @NotNull InstructionAdapter v) {
         coerce(this.type, toType, v);
     }
 
-    protected void coerceFrom(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
+    protected void coerceFrom(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
         coerce(topOfStackType, this.type, v);
     }
 
@@ -657,7 +657,7 @@ public abstract class StackValue {
 
         @Override
         public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
     }
 
@@ -692,13 +692,13 @@ public abstract class StackValue {
             if (isLateinit) {
                 StackValue.genNonNullAssertForLateinit(v, name.asString());
             }
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
             // TODO unbox
         }
 
         @Override
-        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
+        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
+            coerceFrom(topOfStackType, topOfStackKotlinType, v);
             v.store(index, this.type);
             if (isLateinit) {
                 PseudoInsnsKt.storeNotNull(v);
@@ -782,7 +782,7 @@ public abstract class StackValue {
 
         @Override
         public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
 
         @Override
@@ -803,7 +803,7 @@ public abstract class StackValue {
                     throw new UnsupportedOperationException("don't know how to move type " + type + " to top of stack");
                 }
 
-                coerceTo(type, v);
+                coerceTo(type, kotlinType, v);
             }
             else if (depth == 2) {
                 int size = this.type.getSize();
@@ -819,7 +819,7 @@ public abstract class StackValue {
                     throw new UnsupportedOperationException("don't know how to move type " + type + " to top of stack");
                 }
 
-                coerceTo(type, v);
+                coerceTo(type, kotlinType, v);
             }
             else {
                 throw new UnsupportedOperationException("unsupported move-to-top depth " + depth);
@@ -859,7 +859,7 @@ public abstract class StackValue {
             }
 
             if (value != null || AsmUtil.isPrimitive(type)) {
-                coerceTo(type, v);
+                coerceTo(type, kotlinType, v);
             }
         }
     }
@@ -873,8 +873,8 @@ public abstract class StackValue {
         }
 
         @Override
-        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
+        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
+            coerceFrom(topOfStackType, topOfStackKotlinType, v);
             v.astore(this.type);
         }
 
@@ -888,7 +888,7 @@ public abstract class StackValue {
                 @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v
         ) {
             v.aload(this.type);    // assumes array and index are on the stack
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
     }
 
@@ -1078,7 +1078,7 @@ public abstract class StackValue {
             }
             CallGenerator callGenerator = getCallGenerator();
             callGenerator.genCall(getter, resolvedGetCall, genDefaultMaskIfPresent(callGenerator), codegen);
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
 
         private boolean genDefaultMaskIfPresent(CallGenerator callGenerator) {
@@ -1194,12 +1194,12 @@ public abstract class StackValue {
         @Override
         public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
             v.visitFieldInsn(isStaticPut ? GETSTATIC : GETFIELD, owner.getInternalName(), name, this.type.getDescriptor());
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
 
         @Override
-        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
+        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
+            coerceFrom(topOfStackType, topOfStackKotlinType, v);
             v.visitFieldInsn(isStaticStore ? PUTSTATIC : PUTFIELD, owner.getInternalName(), name, this.type.getDescriptor());
         }
 
@@ -1248,7 +1248,7 @@ public abstract class StackValue {
                 if (!skipLateinitAssertion) {
                     genNotNullAssertionForLateInitIfNeeded(v);
                 }
-                coerceTo(type, v);
+                coerceTo(type, kotlinType, v);
             }
             else {
                 PropertyGetterDescriptor getterDescriptor = descriptor.getGetter();
@@ -1340,9 +1340,9 @@ public abstract class StackValue {
         }
 
         @Override
-        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
+        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
             if (setter == null) {
-                coerceFrom(topOfStackType, v);
+                coerceFrom(topOfStackType, topOfStackKotlinType, v);
                 assert fieldName != null : "Property should have either a setter or a field name: " + descriptor;
                 assert backingFieldOwner != null : "Property should have either a setter or a backingFieldOwner: " + descriptor;
                 v.visitFieldInsn(isStaticStore ? PUTSTATIC : PUTFIELD, backingFieldOwner.getInternalName(), fieldName, this.type.getDescriptor());
@@ -1439,13 +1439,13 @@ public abstract class StackValue {
             if (isLateinit) {
                 StackValue.genNonNullAssertForLateinit(v, name.asString());
             }
-            coerceFrom(refType, v);
-            coerceTo(type, v);
+            coerceFrom(refType, null, v);
+            coerceTo(type, kotlinType, v);
         }
 
         @Override
-        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
+        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
+            coerceFrom(topOfStackType, topOfStackKotlinType, v);
             Type refType = refType(this.type);
             Type sharedType = sharedTypeForType(this.type);
             v.visitFieldInsn(PUTFIELD, sharedType.getInternalName(), "element", refType.getDescriptor());
@@ -1503,13 +1503,13 @@ public abstract class StackValue {
             if (isLateinit) {
                 StackValue.genNonNullAssertForLateinit(v, variableName.asString());
             }
-            coerceFrom(refType, v);
-            coerceTo(type, v);
+            coerceFrom(refType, null, v);
+            coerceTo(type, kotlinType, v);
         }
 
         @Override
-        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
+        public void storeSelector(@NotNull Type topOfStackType, @Nullable KotlinType topOfStackKotlinType, @NotNull InstructionAdapter v) {
+            coerceFrom(topOfStackType, topOfStackKotlinType, v);
             v.visitFieldInsn(PUTFIELD, sharedTypeForType(type).getInternalName(), "element", refType(type).getDescriptor());
         }
 
@@ -1558,7 +1558,7 @@ public abstract class StackValue {
         public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
             if (!type.equals(Type.VOID_TYPE)) {
                 v.load(index, Type.INT_TYPE);
-                coerceTo(type, v);
+                coerceTo(type, kotlinType, v);
             }
             v.iinc(index, increment);
         }
@@ -1579,7 +1579,7 @@ public abstract class StackValue {
             v.iinc(index, increment);
             if (!type.equals(Type.VOID_TYPE)) {
                 v.load(index, Type.INT_TYPE);
-                coerceTo(type, v);
+                coerceTo(type, kotlinType, v);
             }
         }
     }
@@ -1609,7 +1609,7 @@ public abstract class StackValue {
             value.store(codegen.invokeFunction(resolvedCall, StackValue.onStack(this.type)), v, true);
 
             value.put(this.type, this.kotlinType, v, true);
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
     }
 
@@ -1851,7 +1851,7 @@ public abstract class StackValue {
                 v.dup();
                 v.ifnull(ifNull);
             }
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
     }
 
@@ -1876,7 +1876,7 @@ public abstract class StackValue {
             }
             v.mark(end);
 
-            coerceTo(type, v);
+            coerceTo(type, kotlinType, v);
         }
 
         @Override
