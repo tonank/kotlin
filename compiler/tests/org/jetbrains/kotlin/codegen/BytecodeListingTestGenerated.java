@@ -273,6 +273,12 @@ public class BytecodeListingTestGenerated extends AbstractBytecodeListingTest {
             doTest(fileName);
         }
 
+        @TestMetadata("computablePropertiesInsideInlineClass.kt")
+        public void testComputablePropertiesInsideInlineClass() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeListing/inlineClasses/computablePropertiesInsideInlineClass.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("noBridgesForErasedInlineClass.kt")
         public void testNoBridgesForErasedInlineClass() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeListing/inlineClasses/noBridgesForErasedInlineClass.kt");
