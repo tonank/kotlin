@@ -302,7 +302,7 @@ class DeprecationResolver(
                     ProtoBuf.VersionRequirement.VersionKind.API_VERSION ->
                         languageVersionSettings.apiVersion
                     ProtoBuf.VersionRequirement.VersionKind.COMPILER_VERSION ->
-                        KotlinCompilerVersion.getVersion()?.let((ApiVersion)::parse) ?: ApiVersion.LATEST_STABLE
+                        KotlinCompilerVersion.getVersion()?.let((ApiVersion)::parse)
                     else -> null
                 }
                 if (currentVersion != null && currentVersion < requiredVersion) {
