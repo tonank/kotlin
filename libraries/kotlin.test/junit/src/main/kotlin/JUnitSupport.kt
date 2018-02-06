@@ -3,21 +3,30 @@ package kotlin.test.junit
 import org.junit.*
 import kotlin.test.*
 
+/**
+ * Provides [JUnitAsserter] if `org.junit.Assert` is found in the classpath.
+ */
 class JUnitContributor : AsserterContributor {
     override fun contribute(): Asserter? {
-        for (stackFrame in currentStackTrace()) {
-            @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-            val className = stackFrame.className as java.lang.String
-
-            if (className.startsWith("org.junit.") || className.startsWith("junit.")) {
-                return JUnitAsserter
-            }
-        }
-
-        return null
+        return if (hasJUnitInClassPath) JUnitAsserter else null
     }
+
+    private val hasJUnitInClassPath by lazy {
+        try {
+            executeAssert()
+            true
+        } catch (_: ClassNotFoundException) {
+            false
+        }
+    }
+
+    private fun executeAssert() = org.junit.Assert.assertTrue(true)
+
 }
 
+/**
+ * Implements `kotlin.test` assertions by delegating them to `org.junit.Assert` class.
+ */
 object JUnitAsserter : Asserter {
     override fun assertEquals(message: String?, expected: Any?, actual: Any?) {
         Assert.assertEquals(message, expected, actual)
