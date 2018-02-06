@@ -11277,6 +11277,12 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             doTest(fileName);
         }
 
+        @TestMetadata("referToPropertyInCompanionObjectOfInlineClass.kt")
+        public void testReferToPropertyInCompanionObjectOfInlineClass() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/inlineClasses/referToPropertyInCompanionObjectOfInlineClass.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("useInlineFunctionInsideInlineClass.kt")
         public void testUseInlineFunctionInsideInlineClass() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/inlineClasses/useInlineFunctionInsideInlineClass.kt");
