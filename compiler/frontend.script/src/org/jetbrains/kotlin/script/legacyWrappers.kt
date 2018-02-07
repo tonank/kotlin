@@ -31,6 +31,9 @@ interface LegacyResolverWrapper
 internal class LegacyPackageDependencyResolverWrapper(
         val legacyResolver: ScriptDependenciesResolver
 ) : kotlin.script.experimental.dependencies.DependenciesResolver, LegacyResolverWrapper {
+
+    private var previousDependencies: KotlinScriptExternalDependencies? = null
+
     override fun resolve(
             scriptContents: kotlin.script.dependencies.ScriptContents,
             environment: Environment
@@ -45,7 +48,8 @@ internal class LegacyPackageDependencyResolverWrapper(
                 environment,
                 { sev, msg, pos ->
                     reports.add(ScriptReport(msg, sev.convertSeverity(), pos?.convertPosition()))
-                }, null
+                },
+                previousDependencies
         ).get() ?: return DependenciesResolver.ResolveResult.Failure(reports)
 
         val dependencies = ScriptDependencies(
@@ -55,6 +59,7 @@ internal class LegacyPackageDependencyResolverWrapper(
                 sources = legacyDeps.sources.toList(),
                 scripts = legacyDeps.scripts.toList()
         )
+        previousDependencies = legacyDeps
         return DependenciesResolver.ResolveResult.Success(dependencies, reports)
     }
 
