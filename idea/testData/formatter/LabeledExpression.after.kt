@@ -1,5 +1,5 @@
 fun test1() {
-    loop@while (true) {
+    loop@ while (true) {
 
     }
 }
