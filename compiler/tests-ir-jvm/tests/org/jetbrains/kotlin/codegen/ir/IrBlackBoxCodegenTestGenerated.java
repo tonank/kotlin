@@ -10329,6 +10329,12 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             doTest(fileName);
         }
 
+        @TestMetadata("inlineClassAsLastExpressionInInLambda.kt")
+        public void testInlineClassAsLastExpressionInInLambda() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/inlineClasses/inlineClassAsLastExpressionInInLambda.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("referToPropertyInCompanionObjectOfInlineClass.kt")
         public void testReferToPropertyInCompanionObjectOfInlineClass() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/inlineClasses/referToPropertyInCompanionObjectOfInlineClass.kt");

@@ -1899,6 +1899,12 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
             doTest(fileName);
         }
 
+        @TestMetadata("boxUnboxInsideLambdaAsLastExpression.kt")
+        public void testBoxUnboxInsideLambdaAsLastExpression() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/inlineClasses/boxUnboxInsideLambdaAsLastExpression.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("callMemberMethodsInsideInlineClass.kt")
         public void testCallMemberMethodsInsideInlineClass() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/inlineClasses/callMemberMethodsInsideInlineClass.kt");
@@ -1926,12 +1932,6 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
         @TestMetadata("inlineClassBoxingUnboxingInsideInlinedLambda.kt")
         public void testInlineClassBoxingUnboxingInsideInlinedLambda() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/inlineClasses/inlineClassBoxingUnboxingInsideInlinedLambda.kt");
-            doTest(fileName);
-        }
-
-        @TestMetadata("inlineClassCallsDefaultValue.kt")
-        public void testInlineClassCallsDefaultValue() throws Exception {
-            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/inlineClasses/inlineClassCallsDefaultValue.kt");
             doTest(fileName);
         }
 
