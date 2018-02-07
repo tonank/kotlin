@@ -113,20 +113,11 @@ class KotlinGradleLibraryDataService : AbstractProjectDataService<LibraryData, V
             project: Project,
             modelsProvider: IdeModifiableModelsProvider
     ) {
-        if (toImport.isEmpty()) return
-        val projectDataNode = toImport.first().parent!! as DataNode<ProjectData>
-        val moduleDataNodes = projectDataNode.children.filter { it.data is ModuleData } as List<DataNode<ModuleData>>
-        val anyNonJvmModules = moduleDataNodes.any { detectPlatformByPlugin(it)?.takeIf { it !is TargetPlatformKind.Jvm } != null }
         for (libraryDataNode in toImport) {
             val ideLibrary = modelsProvider.findIdeLibrary(libraryDataNode.data) ?: continue
 
             val modifiableModel = modelsProvider.getModifiableLibraryModel(ideLibrary) as LibraryEx.ModifiableModelEx
-            if (anyNonJvmModules) {
-                detectLibraryKind(modifiableModel.getFiles(OrderRootType.CLASSES))?.let { modifiableModel.kind = it }
-            }
-            else if (ideLibrary is LibraryImpl && (ideLibrary.kind is JSLibraryKind || ideLibrary.kind is CommonLibraryKind)) {
-                resetLibraryKind(modifiableModel)
-            }
+            detectLibraryKind(modifiableModel.getFiles(OrderRootType.CLASSES))?.let { modifiableModel.kind = it }
         }
     }
 
